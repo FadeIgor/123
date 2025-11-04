@@ -1,0 +1,188 @@
+# Zadanie 2.1
+def przestaw(A):
+    klucz = A[0]
+    w = 0
+
+    for k in range(1, len(A)):
+        if A[k] < klucz:
+            A[w], A[k] = A[k], A[w]
+            w += 1
+    return A
+
+A = [10, 9, 8, 7, 6, 5, 11]
+print(przestaw(A))
+
+#4.1
+def czy_punkt_należy_do_brzegu(a, b, x, y, r): #do funkcji wrzucamy wszystkie argumenty równania
+  if (x-a)**a + (y-b)**2 == r**2:
+    return True
+  return False
+
+
+  def czy_punkt_lezy_wewnatrz_kola(a, b, x, y, r):
+    if (x-a)**2 + (y-b)**2 < r**2:
+      return True
+    return False
+
+x_srodek_kola = 200
+y_srodek_kola = 200
+promien_kola = 200
+
+nalezace_do_brzegu = [] #tu podajemy współrzędne
+ile_lezy_wewnatrz = 0 #tu podajemy liczbę punktów leżących wewnątrz koła
+
+
+for punkt in wszystkie_punkty: #zmienna wszystkie_punkty zawiera dane z pliku punkty.txt
+    punkt = punkt.strip() #pozbywam
+    wspolrzedne_punktu = punkt.split(' ')
+    x = int(wspolrzedne_punktu[0])
+    y = int(wspolrzedne_punktu[1])
+
+    if czy_punkt_należy_do_brzegu(
+        x_srodek_kola, #to jest a, współrzędna środka koła
+        y_srodek_kola, #to jest b, współrzędna środka koła
+        x,
+        y,
+        promien_kola):
+        nalezace_do_brzegu.append(f"({x}, {y})")
+#4.2
+import math
+
+# Dane kwadratu i koła
+center_x, center_y = 200, 200
+radius = 200
+
+# Funkcja sprawdzająca, czy punkt należy do koła
+def punkt_w_kole(x, y):
+    return (x - center_x) ** 2 + (y - center_y) ** 2 <= radius ** 2
+
+# Wczytanie punktów z pliku
+punkty = []
+with open("punkty.txt", "r") as plik:
+    for linia in plik:
+        x, y = map(int, linia.split())
+        punkty.append((x, y))
+
+def przyblizenie_pi(n):
+    """Zwraca przybliżoną wartość liczby pi dla pierwszych n punktów."""
+    wybrane = punkty[:n]
+    nk = sum(1 for (x, y) in wybrane if punkt_w_kole(x, y))
+    # z proporcji nk/n ≈ Pk/P = πr² / (a²)
+    # π ≈ (nk/n) * (a² / r²)
+    a = 400
+    pi_przybl = (nk / n) * (a ** 2 / radius ** 2)
+    return round(pi_przybl, 4)
+
+# Obliczenia dla trzech zakresów
+for n in [1000, 5000, 10000]:
+    print(f"Przybliżenie π dla pierwszych {n} punktów: {przyblizenie_pi(n)}")
+
+#4.3
+import math
+
+N = 1700
+
+# otwieranie plików
+with open("punkty.txt", "r") as plik, open("wyniki_4.txt", "w") as wyniki:
+    # pobieranie danych do list x i y
+    x = [0] * N
+    y = [0] * N
+    n = [0] * N
+    w = [0.0] * N
+
+    # środek okręgu S = (a, b)
+    a = 200
+    b = 200
+    # promień okręgu
+    r = 200
+
+    dane = [list(map(int, line.split())) for line in plik.readlines()]
+
+    for i in range(N):
+        x[i], y[i] = dane[i]
+        ile = 0
+        for j in range(i + 1):
+            wynik = (x[j] - a) ** 2 + (y[j] - b) ** 2
+            if wynik <= r * r:
+                ile += 1
+        n[i] = ile
+        if i != 0:
+            w[i] = abs(math.pi - (ile / i) * 4)
+        else:
+            w[i] = 0.0  # uniknięcie dzielenia przez zero
+
+    # zapis wyników
+    for i in range(1, N):
+        wyniki.write(f"{w[i]:.4f}\n")
+#6.1
+plik = open('dane_6_1.txt', 'r')
+wiersze = plik.readflines()
+
+def zaszyfruj_litere(litera, klucz):
+  ascii = ord(litera)
+  klucz = klucz % 26
+  if(ascii + klucz > 90):
+    return chr(ascii + klucz - 26)
+  return chr(ascii + klucz)
+
+zaszyfrowane_slowa = []
+klucz = 107
+for slowo in wiersze:
+  zaszyfrowane_slowo = ''
+  slowo = slowo.strip()
+
+  for litera in slowo:
+    zaszyfrowane_slowo += zaszyfruj_litere(litera, klucz)
+  zaszyfrowane_slowa.append(zaszyfrowane_slowo)
+
+plik.close()
+plik = open('wyniki_6_1.txt', 'w')
+plik.write('6.1.:\n')
+for zaszyfrowane_slowo in zaszyfrowane_slowa:
+  plik.write(f'''(zaszyfrowane_slowo)\n''')
+plik.close()
+
+#6.2
+def deszyfruj(szyfrogram, klucz):
+    odszyfr = ""
+    for znak in szyfrogram:
+        # przesunięcie cykliczne wstecz
+        przes = (ord(znak) - 65 - klucz) % 26
+        odszyfr += chr(przes + 65)
+    return odszyfr
+
+def main():
+    with open("dane_6_2.txt", "r") as f:
+        linie = [w.strip().split() for w in f.readlines()]
+
+    wyniki = []
+    for slowo, k in linie:
+        wyniki.append(deszyfruj(slowo, int(k)))
+
+    with open("wyniki_6_2.txt", "w") as f:
+        for w in wyniki:
+            f.write(w + "\n")
+
+if __name__ == "__main__":
+    main()
+
+#6.3
+def oblicz_klucz(jawne, szyfr):
+    # różnica kodów liter modulo 26
+    return (ord(szyfr) - ord(jawne)) % 26
+
+def main():
+    zle_slowo = []
+    with open("dane_6_3.txt", "r") as f:
+        for linia in f:
+            slowo, szyfrogram = linia.strip().split()
+            klucze = [oblicz_klucz(a, b) for a, b in zip(slowo, szyfrogram)]
+            if len(set(klucze)) != 1:  # różne przesunięcia = błędne szyfrowanie
+                zle_slowo.append(slowo)
+
+    with open("wyniki_6_3.txt", "w") as f:
+        for w in zle_slowo:
+            f.write(w + "\n")
+
+if __name__ == "__main__":
+    main()
